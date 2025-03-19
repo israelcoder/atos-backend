@@ -1,0 +1,20 @@
+/backend
+├── src
+│   ├── controllers
+│   │   ├── usuarioController.js   // Lógica para cadastro, ativação e login
+│   │   └── chamadoController.js     // Lógica para criação, listagem e atualização de chamados
+│   ├── routes
+│   │   ├── usuarioRoutes.js         // Rotas para usuário (cadastro, ativação, login)
+│   │   └── chamadoRoutes.js         // Rotas para gerenciamento de chamados
+│   ├── plugins
+│   │   ├── dbConnector.js           // Conexão com o MySQL
+│   │   └── authMiddleware.js        // Middleware de autenticação (se necessário para futuras expansões)
+│   ├── models
+│   │   ├── Usuario.js               // Model para usuários
+│   │   └── Chamado.js               // Model para chamados
+│   ├── services
+│   │   └── emailService.js          // Serviço para envio de e-mails via Nodemailer
+│   ├── utils
+│   │   └── tokenUtils.js            // Funções para gerar e validar tokens JWT para ativação
+│   └── server.js                    // Inicialização do servidor Fastify e registro dos plugins e rotas
+└── package.json

@@ -1,0 +1,205 @@
+📌 Planejamento Detalhado do Back-end do Hit
+1️⃣ Configuração do Ambiente de Desenvolvimento
+Antes de codar, precisamos configurar um ambiente eficiente para garantir produtividade e organização.
+
+🔹 1.1 – Criar o Repositório e Estruturar o Projeto
+✅ Criar um repositório no GitHub/GitLab
+✅ Clonar o repositório para a máquina local
+✅ Criar a estrutura básica de pastas do projeto
+
+plaintext
+Copiar
+Editar
+hit-backend/
+│── src/
+│   ├── controllers/
+│   ├── services/
+│   ├── models/
+│   ├── routes/
+│   ├── middlewares/
+│   ├── config/
+│   ├── utils/
+│── tests/
+│── .env
+│── package.json
+│── tsconfig.json (caso use TypeScript)
+│── README.md
+🔹 Sugestão:
+
+Manter a separação entre controllers, services e models para seguir o padrão MVC (Model-View-Controller).
+Criar um README bem estruturado desde o início com informações sobre como rodar o projeto.
+🔹 1.2 – Inicializar o Projeto e Instalar Dependências
+bash
+Copiar
+Editar
+npm init -y  # Criar package.json
+npm install fastify dotenv bcryptjs jsonwebtoken mysql2 zod
+npm install nodemon tsx --save-dev
+🔹 Explicação das Dependências:
+
+Fastify – Framework web rápido e leve.
+dotenv – Gerenciar variáveis de ambiente.
+bcryptjs – Criptografar senhas.
+jsonwebtoken – Implementar autenticação via JWT.
+mysql2 – Conectar ao MySQL.
+zod – Validação de dados.
+nodemon – Atualizar automaticamente o servidor durante o desenvolvimento.
+tsx – Rodar TypeScript diretamente (caso opte por TypeScript).
+🔹 1.3 – Criar o Servidor com Fastify
+✅ Criar um arquivo server.js ou server.ts
+✅ Configurar o Fastify e as rotas básicas
+✅ Implementar o carregamento do .env
+
+javascript
+Copiar
+Editar
+import Fastify from 'fastify';
+import dotenv from 'dotenv';
+
+dotenv.config();
+const app = Fastify();
+
+app.get('/', async () => {
+  return { message: 'API Hit está rodando!' };
+});
+
+app.listen({ port: process.env.PORT || 3000 }, () => {
+  console.log('Servidor rodando 🚀');
+});
+2️⃣ Configuração do Banco de Dados (MySQL)
+Vamos estruturar o banco de dados, definindo as tabelas e seus relacionamentos.
+
+🔹 2.1 – Criar e Configurar o Banco de Dados
+✅ Criar o banco no MySQL:
+
+sql
+Copiar
+Editar
+CREATE DATABASE hit_chamados;
+✅ Criar a conexão no código (config/database.js)
+
+javascript
+Copiar
+Editar
+import mysql from 'mysql2/promise';
+
+export const db = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+});
+✅ Criar as tabelas iniciais:
+
+sql
+Copiar
+Editar
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('cliente', 'tecnico', 'admin') DEFAULT 'cliente',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE chamados (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    status ENUM('aberto', 'em andamento', 'resolvido') DEFAULT 'aberto',
+    user_id INT,
+    assigned_to INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (assigned_to) REFERENCES users(id)
+);
+3️⃣ Implementação da Autenticação
+Para garantir segurança no sistema, vamos implementar registro, login e autenticação JWT.
+
+🔹 3.1 – Criar o Serviço de Usuário (services/userService.js)
+✅ Criar funções para:
+
+Registrar usuário (hash de senha com bcryptjs)
+Login (comparação de senha e geração de JWT)
+javascript
+Copiar
+Editar
+import { db } from '../config/database.js';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+
+export async function registerUser(name, email, password, role) {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const [result] = await db.query(
+        "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
+        [name, email, hashedPassword, role]
+    );
+    return result;
+}
+
+export async function loginUser(email, password) {
+    const [users] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
+    if (users.length === 0) throw new Error("Usuário não encontrado");
+
+    const user = users[0];
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) throw new Error("Senha inválida");
+
+    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return { token, user };
+}
+🔹 3.2 – Criar Rotas de Autenticação (routes/authRoutes.js)
+✅ Criar endpoints para login e registro
+
+javascript
+Copiar
+Editar
+import { registerUser, loginUser } from '../services/userService.js';
+
+app.post('/register', async (req, reply) => {
+    try {
+        const { name, email, password, role } = req.body;
+        await registerUser(name, email, password, role);
+        return reply.status(201).send({ message: "Usuário registrado!" });
+    } catch (error) {
+        return reply.status(400).send({ error: error.message });
+    }
+});
+
+app.post('/login', async (req, reply) => {
+    try {
+        const { email, password } = req.body;
+        const data = await loginUser(email, password);
+        return reply.send(data);
+    } catch (error) {
+        return reply.status(400).send({ error: error.message });
+    }
+});
+🔹 3.3 – Criar Middleware de Autenticação (middlewares/authMiddleware.js)
+✅ Proteger rotas que exigem usuário autenticado
+
+javascript
+Copiar
+Editar
+import jwt from 'jsonwebtoken';
+
+export function authMiddleware(req, reply, done) {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return reply.status(401).send({ error: "Acesso negado" });
+
+    try {
+        req.user = jwt.verify(token, process.env.JWT_SECRET);
+        done();
+    } catch {
+        return reply.status(403).send({ error: "Token inválido" });
+    }
+}
+🚀 Próximos Passos
+Agora que temos o ambiente configurado, o banco de dados estruturado e a autenticação implementada, podemos seguir para:
+✅ CRUD de Chamados – Criar, listar, atualizar e encerrar chamados.
+✅ Sistema de Permissões – Apenas técnicos podem mudar status.
+✅ Painel Administrativo – Relatórios e gestão de usuários.
+
+Isso está bem detalhado? Quer que quebre ainda mais alguma parte? 🚀
