@@ -1,16 +1,30 @@
+import authRoutes from "./src/routes/authRoutes.js"
+import ticketRoutes from "./src/routes/ticketRoutes.js";
+import dotenv from 'dotenv'
+dotenv.config()
 
 import {fastify} from "fastify";
-import cors from '@fastify/cors'
-
 const server = fastify()
 
-server.get('/test', (request, reply) =>{
-    return reply.status(200).send('running')
+server.addHook('onRequest',(req, reply, done)=>{
+    if(!req.headers['content-type'] || req.headers['content-type'] !=='application/json'){
+        reply.header('content-type','application/json')
+    }
+    done()
 })
-server.register(cors,{
-    origin: "*"
+
+
+server.register(authRoutes)
+server.register(ticketRoutes)
+
+server.get('/', async (request, reply) =>{
+    return reply.status(200).send('API Hit rodando!')
 })
-server.listen({
-    port:3001
+server.listen({host:'127.0.0.1', port:process.env.PORT}, (err, adress) =>{
+        if(err){
+            console.error(err)
+            process.exit(1)
+        }
+        console.log(`Servidor rodando em ${adress}`)
 })
 
