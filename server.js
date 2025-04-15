@@ -20,7 +20,7 @@ server.register(ticketRoutes)
 server.get('/', async (request, reply) =>{
     return reply.status(200).send('API Hit rodando!')
 })
-server.listen({host:'127.0.0.1', port:process.env.PORT}, (err, adress) =>{
+server.listen({host:'0.0.0.0', port:process.env.PORT}, (err, adress) =>{
         if(err){
             console.error(err)
             process.exit(1)
