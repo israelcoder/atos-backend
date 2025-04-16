@@ -1,7 +1,8 @@
 import authRoutes from "./src/routes/authRoutes.js"
 import ticketRoutes from "./src/routes/ticketRoutes.js";
 
-const cors = require('@fastify/cors')
+import fastifyCors from "@fastify/cors";
+const cors  = fastifyCors
 
 import dotenv from 'dotenv'
 dotenv.config()
