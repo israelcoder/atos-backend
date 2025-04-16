@@ -1,5 +1,8 @@
 import authRoutes from "./src/routes/authRoutes.js"
 import ticketRoutes from "./src/routes/ticketRoutes.js";
+
+const cors = require('@fastify/cors')
+
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -13,7 +16,10 @@ server.addHook('onRequest',(req, reply, done)=>{
     done()
 })
 
-
+server.register(cors, {
+    origin: '*',
+    allowedHeaders: ['Content-Type','Authorization'],
+})
 server.register(authRoutes)
 server.register(ticketRoutes)
 
