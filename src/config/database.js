@@ -15,6 +15,6 @@ export const db = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    connectTimeout: 10000 // 10 segundos
+    connectTimeout: 30000 // 10 segundos
 });
 
