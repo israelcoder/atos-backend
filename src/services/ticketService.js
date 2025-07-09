@@ -1,35 +1,72 @@
-import {db} from "../config/database.js"
+// import {db} from "../config/database.js"
+import prisma from "../../lib/prisma.js"
 
-export async function createTicket(title, description, userId){
-    const [result] = await db.query(
-        "INSERT INTO chamados (title, description, user_id) VALUES(?, ?, ?)",[title, description, userId]
-    )
-    return result.insertId
+export async function createTicket({title, description, userId, tenantId}){
+    const ticket = await prisma.chamados.create({
+        data:{
+            title, description, userId, tenantId:tenantId, status:"aberto"
+        }
+    })
+    return ticket
 }
 
 export async function getTickets(){
    try {
-    const [tickets] = await db.query("SELECT * FROM  chamados")
+    const tickets = await prisma.chamados.findMany({
+    })
     return tickets || []
    } catch(error){
     throw new Error('Erro ao buscar tickets' + error.message)
    }
 }
 export async function getTicketsById(ticketId){
-    const [tickets] = await db.query("SELECT * FROM  chamados WHERE id = ?",[ticketId])
-    return tickets[0]
+    const tickets= await prisma.chamados.findUnique({
+        where:{id: ticketId}
+    })
+    return tickets
 }
 
-export async function updateTicket(ticketId, status, assignedTo){
+export async function updateTicketContent(userId,title, description, ticketId){
+    try{
+        const ticket = await prisma.chamados.findUnique({
+            where:{id:ticketId}
+        })
+        if(!ticket) throw new Error("chamado não encontrado")
+        if(ticket.userId !== userId) throw new Error("voce não tem permissão para editar este chamado")
+        const result = await prisma.chamados.update({
+            where:{id:ticketId},
+            data:{id:userId,title, description}
+        })
+        return result
+    }catch(error){
+        throw new Error(error.message)
+    }
+}
+
+export async function updateTicket(ticketId, status){
     console.log("status recebido: ",status)
     console.log("id do chamado: ",ticketId)
-    const [result] = await db.query(
-        "UPDATE  chamados SET status = ?, assigned_to = ? WHERE id = ?",[status,assignedTo, ticketId]
-    )
-    return result.affectedRows
+    if(!status) throw new Error("campos vazios")
+
+    try{
+        const result = await prisma.chamados.update({
+        where:{id:ticketId},
+        data: {status},
+    })  
+    return result
+
+    }catch(error){
+        throw new Error("chamado não encontrado.")
+    }
 }
 
 export async function deleteTicket(ticketId){
-    const [result] = await db.query("DELETE FROM chamados WHERE id = ?",[ticketId])
-    return result.affectedRows
+    try{
+        const result = await prisma.chamados.delete({
+        where:{id:ticketId}
+    })
+    return result
+    }catch(error){
+        throw new Error("chamado não encontrado.")
+    }
 }

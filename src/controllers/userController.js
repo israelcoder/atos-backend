@@ -2,25 +2,25 @@ import { registerUser, loginUser } from "../services/userService.js";
 import { verifyEmailToken } from "../services/userService.js";
 import { generateToken } from "../utils/generateToken.js";
 import { sendEmail } from "../utils/sendEmail.js";
-import {db} from '../config/database.js';
+// import {db} from '../config/database.js';
+import prisma from "../../lib/prisma.js";
 
 export let pendingUsers = {}
 
 export async function userRegister(req, reply) {
-    const{name, email, password, role} = req.body
-    if(!name|| !email || !password || !role){
+    const{name, email, password, role,email_verified, tenantId} = req.body
+    if(!name|| !email || !password || !role || !tenantId){
         return reply.status(400).send({error:'Todos os campos são obrigatórios!'})
     }
-
-    const[existing] = await db.query(`SELECT * FROM users WHERE email = ?`,[email])
-    if(existing.length > 0){
+    const existing = await prisma.users.findUnique({where: {email}})
+    if(existing){
         return reply.status(400).send({error:'email já cadastrado.'})
     }
     try {
         const verificationToken = generateToken(8)
 
         //salva os dados temporariamente
-        pendingUsers[email] = {name, email, password, role, verificationToken}
+        pendingUsers[email] = {name, email, password, role, verificationToken,email_verified:true, tenantId}
 
         await sendEmail(
             email,

@@ -1,14 +1,19 @@
-import {createTicket, getTickets, getTicketsById, updateTicket, deleteTicket} from "../services/ticketService.js"
+import {createTicket, getTickets, getTicketsById, updateTicket, deleteTicket, updateTicketContent} from "../services/ticketService.js"
 
     export async function createTicketController(req, reply){
         console.log('Criando chamado...')
         try{
             const {title, description} = req.body
+            console.log("Usuário autenticado:", req.user);
+
             const userId = req.user.id
-            const ticketId = await createTicket(title, description, userId)
-            console.log(ticketId)
-            return reply.status(201).send({message:"Chamado criado!", ticketId})
+            const tenantId = req.user.tenantId
+
+            const ticket = await createTicket({title, description, userId,tenantId})
+            console.log(ticket)
+            return reply.status(201).send({message:"Chamado criado!", ticket})
         } catch (error){
+            console.log("aqui")
             return reply.status(400).send({error: error.message})
         }
     }
@@ -22,6 +27,25 @@ import {createTicket, getTickets, getTicketsById, updateTicket, deleteTicket} fr
         const ticket = await getTicketsById(req.params.id)
         if (!ticket) return reply.status(404).send({error: "Chamado não encontrado"})
         return reply.send(ticket)
+    }
+
+    export async function updateTicketContentController(req,reply){
+        const userRole = req.user.role
+        try {
+            if(userRole !== "usuario"){
+                return reply.status(403).send({error:"acesso negado"})
+            }
+
+            const {title, description} = req.body
+            const ticketId =req.params.id
+            const userId = req.user.id
+            const affectedRows = await updateTicketContent(userId, title, description, ticketId)
+
+            if(affectedRows === 0 ) return reply.status(404).send({error: "Chamado não encontrado"})
+            return reply.send({message:"Chamado atualizado!"})
+        } catch(error){
+            return reply.status(400).send({error: error.message})
+        }
     }
 
     export async function updateTicketController (req, reply) {

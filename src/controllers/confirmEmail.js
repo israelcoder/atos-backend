@@ -10,6 +10,7 @@ export async function confirmEmail(req, reply){
     }
     
     const userData = pendingUsers[email]
+    console.log("Recuperado em confirmEmail:", userData)
     if(!userData){
         return reply.status(400).status({error:'Usuario não encontrado ou token expirado. '})
     }
@@ -19,7 +20,7 @@ export async function confirmEmail(req, reply){
     }
 
     try{
-        await registerUser(userData.name, userData.email, userData.password, userData.role)
+        await registerUser(userData.name, userData.email, userData.password, userData.role,userData.verificationToken,userData.email_verified, userData.tenantId)
 
         delete pendingUsers[email]
 
