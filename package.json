@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "jest",
+    "postinstall": "prisma generate",
     "dev": "node --watch --no-warnings server.js",
     "start": "node server.js"
   },
