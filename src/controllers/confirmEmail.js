@@ -1,5 +1,5 @@
 import { registerUser } from "../services/userService.js"
-import { pendingUsers} from "../controllers/userController.js"
+import prisma from "../../lib/prisma.js"
 
 
 export async function confirmEmail(req, reply){
@@ -9,23 +9,42 @@ export async function confirmEmail(req, reply){
         return reply.status(400).send({error:'Email e token são obrigatórios. '})
     }
     
-    const userData = pendingUsers[email]
-    console.log("Recuperado em confirmEmail:", userData)
-    if(!userData){
+    const pendingUsers = await prisma.users.findUnique({
+        where:{email}
+    })
+
+    console.log("Recuperado em confirmEmail:", pendingUsers)
+    if(!pendingUsers){
+        await prisma.users.delete({
+            where:{email: email}
+        })
         return reply.status(400).status({error:'Usuario não encontrado ou token expirado. '})
+
     }
 
-    if(userData.verificationToken !== token){
-        return reply.status(400).send({error:'Token invalido. '})
+    if(pendingUsers.verification_token !== token){
+        console.log(`
+            verificationToken: ${pendingUsers.verification_token},
+            token:${token}
+            `)
+
+        await prisma.users.delete({
+            where:{email: email}
+        })
+        
+        return reply.status(400).send({error:'Token invalido.'})
     }
 
     try{
-        await registerUser(userData.name, userData.email, userData.password, userData.role,userData.verificationToken,userData.email_verified, userData.tenantId)
+        await prisma.users.update({
+            where:{email},
+            data: {
+                email_verified: true
+            }
+        })
 
-        delete pendingUsers[email]
-
-        return reply.send({message:'Email verificado e usuario criado com sucesso'})
+        return reply.send({message:'Email verificado com sucesso.'})
     }catch(error){
-        return reply.status(400).send({error: error.message})
+        return reply.status(400).send("aqui",{error: error.message})
     }
 }

@@ -9,4 +9,4 @@ server.listen({host:'0.0.0.0', port:process.env.PORT},(err, address) =>{
         process.exit(1)
     }
     console.log(`servidor rodando em ${address}`)
-})
+})    
