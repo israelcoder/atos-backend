@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output = "./node_modules/@prisma/client"
+  output = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -45,6 +45,7 @@ model Users {
 
 model Chamados {
   id          String   @id @default(uuid())
+  ticket      String   @unique
   tenantId    String
   title       String
   description String
