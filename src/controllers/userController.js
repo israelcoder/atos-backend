@@ -31,7 +31,7 @@ export async function userRegister(req, reply) {
     await sendEmail(
       email,
       'Código de verificação - ATOS',
-      `Seu código de verificação é :${verificationToken}`,
+      `Seu código de verificação é: ${verificationToken}`,
     );
     return reply.status(200).send({ message: 'Token enviado por email.' });
   } catch (error) {
