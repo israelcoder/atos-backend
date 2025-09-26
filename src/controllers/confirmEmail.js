@@ -20,7 +20,7 @@ export async function confirmEmail(req, reply) {
     });
     return reply
       .status(400)
-      .status({ error: 'Usuario não encontrado ou token expirado. ' });
+      .status({ error: 'Usuário não encontrado ou token expirado. ' });
   }
 
   if (pendingUsers.verification_token !== token) {
