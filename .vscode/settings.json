@@ -1,0 +1,14 @@
+{
+  // Lint
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "eslint.format.enable": true,
+  "editor.codeActionsOnSave": {
+    "source.addMissingImports": "always",
+    "source.fixAll.eslint": "always"
+  },
+
+  // Others
+  "editor.rulers": [80, 120],
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "github.copilot.chat.localeOverride": "pt-br"
+}
