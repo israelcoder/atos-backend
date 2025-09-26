@@ -6,12 +6,12 @@
 
 generator client {
   provider = "prisma-client-js"
-  output = "../node_modules/.prisma/client"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DB_URL")
 }
 
 enum Role {
@@ -27,25 +27,24 @@ enum Status {
 }
 
 model Users {
-  id        String   @id @default(uuid())
-  tenantId  String
-  name      String
-  email     String   @unique
-  password  String
-  role      Role
-  verification_token    String?
-  email_verified    Boolean @default(false)
-
+  id                 String  @id @default(uuid())
+  tenantId           String
+  name               String
+  email              String  @unique
+  password           String
+  role               Role
+  verification_token String?
+  email_verified     Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  chamados  Chamados[]
+  chamados Chamados[]
 }
 
 model Chamados {
-  id          String   @id @default(uuid())
-  ticket      String   @unique
+  id          String @id @default(uuid())
+  ticket      String @unique
   tenantId    String
   title       String
   description String
@@ -55,5 +54,5 @@ model Chamados {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user       Users     @relation(fields: [userId], references: [id])
+  user Users @relation(fields: [userId], references: [id])
 }
