@@ -25,6 +25,10 @@ export async function registerUser(
       tenantId,
     },
   });
+
+  // TODO: User mapper to formatter the return
+  delete user.password;
+
   return user;
 }
 
@@ -45,11 +49,17 @@ export async function loginUser(email, password, email_verified) {
     { expiresIn: '1h' },
   );
 
-  return { token, user };
+  // TODO: User mapper to formatter the return
+  delete user.password;
+
+  return {
+    token,
+    user,
+  };
 }
 
 export async function verifyEmailToken(email, token) {
-  // Busca o usuario pelo email
+  // Busca o usuário pelo email
 
   const user = await prisma.users.findUnique({
     where: { email },
@@ -71,5 +81,7 @@ export async function verifyEmailToken(email, token) {
     },
   });
 
-  return { message: 'Email verificado com sucesso!' };
+  return {
+    message: 'Email verificado com sucesso!',
+  };
 }
