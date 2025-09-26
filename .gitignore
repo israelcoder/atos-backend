@@ -1,8 +1,11 @@
-#node
-# node_modules/
+# folders
+node_modules
+build
 
-#Ambiente
-# .env
+# environment
+.env*
+!.env.example
 
-# file
-# arch-backend
+# files
+arch-backend
+*lock.json
