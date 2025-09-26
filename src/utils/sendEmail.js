@@ -21,10 +21,10 @@ export async function sendEmail(to, subject, text) {
       text,
     });
 
-    console.log('Email enviado:', info.messageId);
+    console.log('E-mail enviado:', info.messageId);
     return info;
   } catch (error) {
-    console.error('Erro ao enviar email:', error);
-    throw new Error('Erro ao enviar email');
+    console.error('Erro ao enviar e-mail:', error);
+    throw new Error('Erro ao enviar e-mail');
   }
 }

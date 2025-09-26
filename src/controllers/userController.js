@@ -30,7 +30,7 @@ export async function userRegister(req, reply) {
 
     await sendEmail(
       email,
-      'Codigo de verificação - ATOS',
+      'Código de verificação - ATOS',
       `Seu código de verificação é :${verificationToken}`,
     );
     return reply.status(200).send({ message: 'Token enviado por email.' });
@@ -54,7 +54,7 @@ export async function confirmEmail(req, reply) {
   const { email, token } = req.body;
 
   if (!email || !token) {
-    return reply.status(400).send({ error: 'Email e token são obrigatórios.' });
+    return reply.status(400).send({ error: 'E-mail e token são obrigatórios.' });
   }
 
   try {
