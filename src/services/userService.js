@@ -2,9 +2,6 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import prisma from '../../lib/prisma.js';
 
-import dotenv from 'dotenv';
-dotenv.config();
-
 export async function registerUser(
   name,
   email,
