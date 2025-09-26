@@ -5,13 +5,13 @@
   "author": "",
   "license": "ISC",
   "description": "",
-  "main": "index.js",
+  "main": "src/server.js",
   "type": "module",
   "scripts": {
     "test": "vitest",
     "postinstall": "prisma generate",
-    "dev": "node --watch --no-warnings server.js",
-    "start": "node server.js"
+    "dev": "node --watch --no-warnings src/server.js",
+    "start": "node src/server.js"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.2",
