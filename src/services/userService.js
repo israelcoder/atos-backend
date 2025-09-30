@@ -37,8 +37,8 @@ export async function loginUser(email, password, email_verified) {
     where: { email },
   });
 
-  if (user.email_verified !== true) throw new Error('Usuario não verificado.');
   if (!user) throw new Error('Usuário não encontrado.');
+  if (!user.email_verified) throw new Error('Usuario não verificado.');
 
   const match = await bcrypt.compare(password, user.password);
   if (!match) throw new Error('Senha invalida.');
