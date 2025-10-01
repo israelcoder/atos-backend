@@ -25,10 +25,6 @@ export async function registerUser(
       tenantId,
     },
   });
-
-  // TODO: User mapper to formatter the return
-  delete user.password;
-
   return user;
 }
 
@@ -40,6 +36,10 @@ export async function loginUser(email, password, email_verified) {
   if (!user) throw new Error('Usuário não encontrado.');
   if (!user.email_verified) throw new Error('Usuario não verificado.');
 
+  if (!user) throw new Error('Usuário não encontrado.');
+  if (user.email_verified !== true) throw new Error('Usuario não verificado.');
+  if (user.active !== true) throw new Error('Usuario inativo!');
+
   const match = await bcrypt.compare(password, user.password);
   if (!match) throw new Error('Senha invalida.');
 
@@ -48,26 +48,34 @@ export async function loginUser(email, password, email_verified) {
     process.env.JWT_SECRET,
     { expiresIn: '1h' },
   );
+  return { token, user };
+}
 
-  // TODO: User mapper to formatter the return
-  delete user.password;
-
-  return {
-    token,
-    user,
-  };
+export async function softDeleteUser(id, tenantId) {
+  try {
+    const result = await prisma.users.update({
+      where: {
+        id: id,
+        tenantId,
+      },
+      data: {
+        active: false,
+      },
+    });
+    if (result.count === 0) {
+      throw new Error('usuario não encontrado');
+    }
+    return { messsage: 'Usuario desativado com sucesso' };
+  } catch (error) {
+    throw new Error(error.message);
+  }
 }
 
 export async function verifyEmailToken(email, token) {
-  // Busca o usuário pelo email
-
+  // Busca o usuario pelo email
   const user = await prisma.users.findUnique({
     where: { email },
   });
-
-  if (!user) {
-    throw new Error('usuario não encontrado.');
-  }
 
   if (user.verification_token !== token) {
     throw new Error('Token invalido.');
