@@ -8,13 +8,9 @@ export async function authenticateToken(req, reply) {
     if (!token) {
       return reply.status(401).send({ error: 'Token não fornecido' });
     }
-    const user = jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-      if (err) {
-        return reply.status(403).send({ message: 'Token inválido' });
-      }
-      console.log(user);
-      req.user = user;
-    });
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = user;
+    console.log(user);
   } catch (error) {
     return reply.status(403).send({ message: 'Token invalido' });
   }

@@ -4,6 +4,8 @@
     "dbaeumer.vscode-eslint",
     "editorconfig.editorconfig",
     "mikestead.dotenv",
-    "humao.rest-client"
+    "humao.rest-client",
+    "streetsidesoftware.code-spell-checker-portuguese-brazilian",
+    "streetsidesoftware.code-spell-checker"
   ]
 }

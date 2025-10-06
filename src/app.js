@@ -1,6 +1,7 @@
 import fastifyCors from '@fastify/cors';
 import { fastify } from 'fastify';
 
+
 import authRoutes from './routes/authRoutes.js';
 import ticketRoutes from './routes/ticketRoutes.js';
 

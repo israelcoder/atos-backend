@@ -28,13 +28,10 @@ export async function registerUser(
   return user;
 }
 
-export async function loginUser(email, password, email_verified) {
+export async function loginUser(email, password) {
   const user = await prisma.users.findUnique({
     where: { email },
   });
-
-  if (!user) throw new Error('Usuário não encontrado.');
-  if (!user.email_verified) throw new Error('Usuario não verificado.');
 
   if (!user) throw new Error('Usuário não encontrado.');
   if (user.email_verified !== true) throw new Error('Usuario não verificado.');
@@ -52,11 +49,14 @@ export async function loginUser(email, password, email_verified) {
 }
 
 export async function softDeleteUser(id, tenantId) {
+  if (!id || !tenantId) {
+    throw new Error('ID e tenantId são obrigatórios.');
+  }
   try {
-    const result = await prisma.users.update({
+    const result = await prisma.users.updateMany({
       where: {
         id: id,
-        tenantId,
+        tenantId: tenantId,
       },
       data: {
         active: false,
@@ -65,7 +65,7 @@ export async function softDeleteUser(id, tenantId) {
     if (result.count === 0) {
       throw new Error('usuario não encontrado');
     }
-    return { messsage: 'Usuario desativado com sucesso' };
+    return { message: 'Usuario desativado com sucesso' };
   } catch (error) {
     throw new Error(error.message);
   }

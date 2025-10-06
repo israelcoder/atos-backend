@@ -58,12 +58,9 @@ export async function userSoftDelete(req, reply) {
 
   try {
     if (userRole !== 'admin') {
-      return reply
-        .status(403)
-        .send({
-          error:
-            'Apenas administradores tem permissão para inativar de usuarios',
-        });
+      return reply.status(403).send({
+        error: 'Apenas administradores tem permissão para inativar de usuarios',
+      });
     }
     await softDeleteUser(userId, tenantId);
     return reply.send({ message: 'Usuario Inativado com sucesso' });

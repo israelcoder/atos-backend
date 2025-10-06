@@ -8,7 +8,11 @@
   },
 
   // Others
-  "editor.rulers": [80, 120],
+  // "editor.rulers": [80, 120],
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "github.copilot.chat.localeOverride": "pt-br"
+  "github.copilot.chat.localeOverride": "pt-br",
+  "postman.settings.dotenv-detection-notification-visibility": false,
+  "editor.formatOnSave": true,
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 200
 }

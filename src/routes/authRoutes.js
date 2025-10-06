@@ -10,5 +10,5 @@ export default function authRoutes(app) {
   app.post('/confirm-email', confirmEmail);
   app.post('/register', userRegister);
   app.post('/login', userLogin);
-  app.put('/users/:id', { preHandler: authenticateToken }, userSoftDelete);
+  app.delete('/users/:id', { preHandler: authenticateToken }, userSoftDelete);
 }
