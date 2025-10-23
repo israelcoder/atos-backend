@@ -2,7 +2,7 @@ import fastifyCors from '@fastify/cors';
 import { fastify } from 'fastify';
 
 
-import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 import ticketRoutes from './routes/ticketRoutes.js';
 
 const server = fastify();
@@ -20,7 +20,7 @@ server.register(fastifyCors, {
   origin: '*',
   allowedHeaders: ['Content-Type', 'Authorization'],
 });
-server.register(authRoutes);
+server.register(userRoutes);
 server.register(ticketRoutes);
 
 server.get('/', async (_, response) => {

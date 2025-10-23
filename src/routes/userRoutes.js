@@ -6,7 +6,7 @@ import {
 import { authenticateToken } from '../middlewares/authMiddleware.js';
 import { confirmEmail } from '../controllers/confirmEmail.js';
 
-export default function authRoutes(app) {
+export default function userRoutes(app) {
   app.post('/confirm-email', confirmEmail);
   app.post('/register', userRegister);
   app.post('/login', userLogin);
